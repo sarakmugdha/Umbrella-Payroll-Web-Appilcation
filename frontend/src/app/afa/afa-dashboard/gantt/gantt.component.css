@@ -1,0 +1,20 @@
+::ng-deep .k-task-single{
+    background-color: #05284e !important;
+}
+::ng-deep .k-current-time{
+    background: #94aac12e;
+}
+::ng-deep .k-button-group > .k-button.k-selected {
+    border-color: #001F3F !important;
+    background-color: #001F3F !important;
+    color: white !important;
+}
+
+::ng-deep .k-button-group > .k-button:not(.k-selected) {
+    border-color: #ccc !important; 
+    color: #001F3F !important; 
+}
+
+::ng-deep .k-gantt{
+    transition: width 500ms;
+}

@@ -1,0 +1,386 @@
+<app-spinner [isLoading]="loading"></app-spinner>
+
+
+<!-- breadcrumb -->
+<nav  aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a routerLink="/afa/dashboard" class="text-decoration-none" >
+                Dashboard
+            </a>
+        </li>
+        <li class="breadcrumb-item" *ngIf="company_name">
+        <a [routerLink]="['/afa/companies']" class="text-decoration-none" >
+            <span class="breadcrumb-title" >{{ company_name }}</span>
+        </a>
+        </li>
+        <li class="breadcrumb-item active" *ngIf="company_name">
+        <span class="breadcrumb-title" >Assignments</span>
+        </li>
+    </ol>
+</nav>
+
+<!-- filteration -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mt-1 mb-0">
+<h3>Assignments</h3>
+<div class="d-flex justify-content-end gap-2">
+
+    <h5>Filter</h5>
+    <button kendoToolTip title="filter data" (click)="onFilterValue()"
+    kendoButton
+    [svgIcon]="searchIcon"
+    class="actionButton"
+    >
+</button>
+</div>
+
+</div>
+
+<!-- search container -->
+<form
+   class="filter-div p-2 mb-3"
+   [formGroup]="filterForm"
+   (ngSubmit)="onSubmit()"
+   *ngIf="onFilter">
+
+    <div class="d-flex justify-content-between ">
+        <div class="d-flex">
+        <div class="pe-4" *ngFor="let filter of filters">
+            <div class="form-group">
+                <label class="form-label fw-bold" > {{ filter.title }}</label>
+                <input *ngIf="filter.editor === 'number' || filter.editor === 'string'"
+                    [type]="filter.editor === 'number' ? 'number' : 'text'"
+                    formControlName="{{ filter.field }}"
+                    class="form-control"
+                    [placeholder]="filter.title"
+                />
+                <div *ngIf = "filter.editor === 'date'" style="color: var(--h3)!important; border: 0px solid var(--kendo-color-border-alt);">
+                    <kendo-datepicker
+                        [formControlName]="filter.field"
+                        [placeholder]="filter.title || ''"
+                        [format]="'dd-MM-yyyy'"
+
+                    >
+                    </kendo-datepicker>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="d-flex justify-content-end text-end align-items-end gap-2">
+        <button kendoButton type="button" class="gap-3"  (click)="onClear()" fillMode="solid" themeColor="base" [svgIcon]="filterClearIcon">Clear</button>
+        <button kendoButton type="submit" class="gap-3 actionButton" [svgIcon]="filterIcon"  >Search</button>
+        </div>
+    </div>
+</form>
+
+<!-- grid -->
+<kendo-grid class="grid"
+    [data]="gridData.data"
+    [pageable]="true"
+    [sortable]="true"
+    [pageSize]="pageSize"
+    [scrollable]="'none'"
+    [resizable]="true"
+    [gridResizable]="true"
+    (pageChange) = "pageChange($event)"
+    (remove) = "onConfirmDelete($event)"
+>
+
+    <ng-template kendoGridToolbarTemplate>
+        <div  class="d-flex justify-content-end align-items-center w-100">
+            <button kendoGridAddCommand kendoToolTip  title="Add Assignment" class="actionButton" [svgIcon]="addIcon" fillMode="solid" themeColor="base" (click)="open()" > Add Assignment </button>
+        </div>
+    </ng-template>
+
+    <kendo-grid-column [width]="122" [minResizableWidth]="55" [maxResizableWidth]="130">
+        <ng-template kendoGridHeaderTemplate>
+            <span kendoTooltip title="Assignments Id">Assignments Id</span>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <div kendoTooltip title="{{ dataItem.assignment_id }}">
+                {{ dataItem.assignment_id }}
+            </div>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-column>
+        <ng-template kendoGridHeaderTemplate>
+            <span kendoTooltip title="People Name">People </span>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <div kendoTooltip title="{{ dataItem.name }}">
+                {{ dataItem.name }}
+            </div>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-column >
+        <ng-template kendoGridHeaderTemplate>
+            <span kendoTooltip title="Customer">Customer</span>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <div kendoTooltip title="{{ dataItem.customer_name }}">
+                {{ dataItem.customer_name }}
+            </div>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-column field="role" title="Role" >
+        <ng-template kendoGridHeaderTemplate>
+            <span kendoTooltip title="Role">Role</span>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <div kendoTooltip title="{{ dataItem.role }}">
+                {{ dataItem.role }}
+            </div>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-column [width]="98" >
+        <ng-template kendoGridHeaderTemplate>
+            <span kendoTooltip title="Start Date">Start Date</span>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <span>{{dataItem.start_date | date:'dd/MM/yyyy'}}</span>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-column [width]="98">
+        <ng-template kendoGridHeaderTemplate>
+            <span kendoTooltip title="End Date">End Date</span>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <span>{{dataItem.end_date | date:'dd/MM/yyyy'}}</span>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-column [width]="95">
+        <ng-template kendoGridHeaderTemplate>
+            <span kendoTooltip title="Status">Status</span>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <span class="badge badge-pill bg-success " *ngIf="dataItem.status == 1" > Active</span>
+            <span class="badge badge-pill bg-danger " *ngIf="dataItem.status == 0" > Inactive</span>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-command-column [width]="95">
+        <ng-template kendoGridHeaderTemplate>
+            <span kendoTooltip title="Action">Action</span>
+        </ng-template>
+        <ng-template kendoGridCellTemplate  let-dataItem>
+         <button kendoGridEditCommand kendoToolTip title="edit" [svgIcon]="pencilIcon" class="actionButton" fillMode="solid" themeColor="base"
+                    [disabled]="assignments.includes(dataItem.assignment_id)"
+                    [attr.title]="assignments.includes(dataItem.assignment_id) ? 'Already assigned, cannot edit.' : 'Edit Assignment'"
+                    (click)="open(dataItem)">
+        </button>
+        <button kendoGridRemoveCommand kendoToolTip title="Delete Assignment" [svgIcon]="trashIcon" class="deleteButton" fillMode="solid" themeColor="base"
+                    [disabled]="assignments.includes(dataItem.assignment_id)"
+                    [attr.title]="assignments.includes(dataItem.assignment_id) ? 'Already assigned, cannot delete.' : 'Delete Assignment'">
+         </button>
+        </ng-template>
+     </kendo-grid-command-column>
+
+</kendo-grid>
+
+<!-- dialog box -->
+<kendo-dialog *ngIf="opened" (close)="close()" [width]="800">
+    <kendo-dialog-titlebar>
+        {{ selectedAssignment ? 'Edit Assignment' : 'Add Assignment' }}
+    </kendo-dialog-titlebar>
+
+    <form [formGroup]="assignmentForm" >
+        <div class="row">
+            <div class="col">
+
+                <div class="form-group">
+                    <label for="customer_id" class="form-label ">Customer Name <span class="text-danger">*</span></label>
+                    <select name="customer_id" class="form-select" formControlName="customer_id"
+                    [ngClass]="{ 'is-invalid': isInvalid('customer_id')   }">
+                        <option *ngFor="let company of companies" [value]="company.customer_id">
+                            {{ company.customer_name }}
+                        </option>
+                    </select>
+
+                    <div class="error-placeholder">
+                        <small *ngIf="assignmentForm.get('customer_id')?.touched && assignmentForm.get('customer_id')?.errors?.['required']" class="text-danger">
+                            Customer is required.
+                        </small>
+                    </div>
+
+                </div>
+
+                <div class="form-group pt-2 pb-2">
+                    <kendo-label text="Start Date" class="form-label" class="k-display-block form-control-label"
+                    [for]="startDate"><span class="text-danger" > *</span></kendo-label>
+
+                        <kendo-datepicker
+                            #startDate
+                            class="custom-datepicker"
+                            formControlName="start_date"
+                            [value]="start_date"
+                            placeholder = "Start Date"
+                            [min]="today"
+                            [format]="'yyyy-MM-dd'"
+                            [disabled]="assignmentForm.get('start_date')?.invalid === true && selectedAssignment != null"
+                            [ngClass]="{ 'is-invalid': isInvalid('start_date') }"
+                            (valueChange)="onstart_dateChange($event)"
+                        >
+
+                        </kendo-datepicker>
+
+                        <div class="error-placeholder">
+                            <small *ngIf="assignmentForm.get('start_date')?.touched && assignmentForm.get('start_date')?.errors?.['required']" class="text-danger">
+                                Assignment start date is required.
+                            </small>
+                        </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="type" class="form-label">Job Type <span class="text-danger">*</span></label>
+                    <select name="type" class="form-select" formControlName="type"
+                    [ngClass]="{'is-invalid' : isInvalid('type')}">
+                        <option value="full_time" >Full Time</option>
+                        <option value="part_time" >Part Time</option>
+                    </select>
+
+                    <div class="error-placeholder">
+                        <small *ngIf="assignmentForm.get('type')?.touched && assignmentForm.get('type')?.errors?.['required']" class="text-danger">
+                            Job type is required.
+                        </small>
+                    </div>
+
+                </div>
+
+                <div class="form-group pb-2 pt-2">
+                    <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="role" formControlName="role"
+                    (input)="validationService.restrictSymbols($event)"
+                    [ngClass]="{ 'is-invalid': isInvalid('role') }">
+
+                    <div class="error-placeholder">
+                        <small *ngIf="assignmentForm.get('role')?.touched && assignmentForm.get('role')?.errors?.['required']" class="text-danger">
+                            Job role is required.
+                        </small>
+                        <small *ngIf="assignmentForm.get('role')?.dirty && assignmentForm.get('role')?.errors?.['pattern']" class="text-danger">
+                            A valid job role is required.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label for="people_id" class="form-label">People Name <span class="text-danger">*</span></label>
+                    <select name="people_id" class="form-select" formControlName="people_id"
+                    [ngClass]="{ 'is-invalid' : isInvalid('people_id')  }">
+
+                        <option  *ngFor="let people of peopleList" [value]="people.people_id" >
+                            {{ people.name }}
+                        </option>
+                    </select>
+
+                    <div class="error-placeholder">
+                        <small *ngIf="assignmentForm.get('people_id')?.touched && assignmentForm.get('people_id')?.errors?.['required']" class="text-danger">
+                            People is required.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group pt-2 pb-2">
+                    <kendo-label text="End Date" class="form-label" class="k-display-block"
+                    [for]="endDate"><span class="text-danger" > *</span></kendo-label>
+                        <kendo-datepicker
+                            #endDate
+                            class="custom-datepicker"
+                            formControlName='end_date'
+                            [value]="end_date"
+                            [format]="'yyyy-MM-dd'"
+                            [disabled]="assignmentForm.get('start_date')?.invalid === true && selectedAssignment != null"
+                            placeholder = "End Date"
+                            [min]="start_date!"
+                            [ngClass]="{ 'is-invalid': isInvalid('end_date') }">
+
+                        </kendo-datepicker>
+
+                        <div class="error-placeholder">
+                            <small *ngIf="assignmentForm.get('end_date')?.touched && assignmentForm.get('end_date')?.errors?.['required']" class="text-danger">
+                                Assignment end date is required.
+                            </small>
+                        </div>
+                </div>
+
+
+        <div class="form-group">
+            <label for="location" class="form-label">Branch <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="location" formControlName="location"
+            required (input)="validationService.restrictSymbols($event)"
+            [ngClass]="{ 'is-invalid' : isInvalid('location') }">
+
+            <div class="error-placeholder">
+                <small *ngIf="assignmentForm.get('location')?.touched && assignmentForm.get('location')?.errors?.['required']" class="text-danger">
+                    Branch is required.
+                </small>
+                <small *ngIf="assignmentForm.get('location')?.dirty && assignmentForm.get('location')?.errors?.['pattern']" class="text-danger">
+                    A valid branch is required.
+                </small>
+            </div>
+
+        </div>
+        <br>
+
+          <div class="form-group">
+            <kendo-label class="k-display-block form-check-label " [for]="statusSwitch" text="Status"><span class="text-danger"> *</span></kendo-label>
+            <kendo-switch
+              #statusSwitch
+              [onLabel] = "''"
+              [offLabel] = "''"
+              (valueChange)="onStatusChange($event)"
+              [checked]="assignmentForm.get('status')?.value === 1">
+            </kendo-switch>
+          </div>
+
+          </div>
+        </div>
+
+        <span *ngIf="isAssigned" class="alert alert-danger d-flex align-items-center justify-content-center mt-3 p-3 shadow-sm rounded" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>People is already assigned during this period!</strong>
+        </span>
+
+        <span *ngIf="assignmentForm.get('start_date')?.invalid && selectedAssignment"
+               class="alert alert-danger d-flex align-items-center justify-content-center mt-3 p-3 shadow-sm rounded" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Cannot be editted, assignment period started!</strong>
+        </span>
+    <br>
+</form>
+
+    <kendo-dialog-actions>
+        <button kendoButton (click)="close()" kendoTooltip title="Cancel">
+            <kendo-icon name="cancel" ></kendo-icon> Cancel
+        </button>
+        <button kendoButton class="actionButton"  (click)="onSave()" [disabled]="assignmentForm.invalid" kendoTooltip title="Save">
+            <kendo-icon name="check"></kendo-icon>Save
+        </button>
+    </kendo-dialog-actions>
+
+</kendo-dialog>
+
+<!-- delete confirmation -->
+<kendo-dialog *ngIf="isDeleteDialogOpen" (close)="onCancelDelete()" [width]="450">
+  <kendo-dialog-titlebar>
+    Confirm Delete
+  </kendo-dialog-titlebar>
+
+  <p>Are you sure you want to delete <strong>{{ deleteDataItem?.dataItem.assignment_id }}</strong>?</p>
+
+  <kendo-dialog-actions>
+    <button kendoButton (click)="onCancelDelete()" themeColor="base" fillMode="solid" class="actionButton">
+      Cancel
+    </button>
+    <button kendoButton (click)="onConfirmDelete()" themeColor="base" class="deleteButton" fillMode="solid">
+      Delete
+    </button>
+  </kendo-dialog-actions>
+</kendo-dialog>

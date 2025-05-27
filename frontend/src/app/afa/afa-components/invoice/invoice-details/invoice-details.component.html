@@ -1,0 +1,157 @@
+<app-spinner [isLoading]="isLoading"></app-spinner>
+
+
+<nav  >
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a routerLink='/afa/dashboard'class="text-decoration-none text-white" >
+           Dashboard
+        </a>
+        </li>
+        <li class="breadcrumb-item" *ngIf="companyName" >
+        <a routerLink='/afa/companies' class="text-decoration-none text-white" >
+            {{companyName}}
+        </a>
+        </li>
+        <li class="breadcrumb-item"  *ngIf="companyName">
+            <a routerLink='/afa/invoice/grid' class="text-decoration-none text-white" >
+                {{invoice.invoice_number}}
+            </a>
+            </li>
+        <li class="breadcrumb-item active"  *ngIf="companyName" >
+        Invoice Details
+        </li>
+    </ol>
+</nav>
+
+<h3>Invoice Details</h3>
+<kendo-grid
+class="grid"
+[data]="invoiceDetailData"
+[pageSize]="pageSize"
+[skip]="skip"
+[sortable]="true"
+[resizable]="true"
+[pageable]="true"
+[scrollable]="'none'"
+
+
+(add)="addRow()"
+(pageChange)="pageChange($event)"
+(edit)="editRow($event)"
+(remove)="deleteRow($event)"
+>
+
+
+<ng-template kendoGridToolbarTemplate>
+    <div class="d-flex justify-content-end w-100" *ngIf="isInDraft">
+  <button kendoGridAddCommand  kendoToolTip title="add new line item"
+    class="actionButton" [svgIcon]="addIcon" fillmode="solid" themeColor="base"  >Add Line Item</button>
+    </div>
+
+</ng-template>
+
+<kendo-grid-column field="invoice_detail_id" title="Line Number">
+    </kendo-grid-column>
+<kendo-grid-column field="description" title="Description">
+    </kendo-grid-column>
+<kendo-grid-column field="hours_worked" title="Hours Worked">
+    </kendo-grid-column>
+    <kendo-grid-column field="hourly_pay" title="Hourly Pay">
+        <ng-template kendoGridCellTemplate let-dataItem>
+          <div class="d-flex justify-content-end align-items-center">
+            {{ dataItem.hourly_pay | currency:'EUR' }}
+          </div>
+        </ng-template>
+      </kendo-grid-column>
+
+      <kendo-grid-column field="total_pay" title="Total Pay">
+        <ng-template kendoGridCellTemplate let-dataItem>
+          <div class="d-flex justify-content-end align-items-center">
+            {{ dataItem.total_pay | currency:'EUR' }}
+          </div>
+        </ng-template>
+      </kendo-grid-column>
+
+        <kendo-grid-command-column title="Actions" [width]="225" >
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <button  kendoGridEditCommand kendoToolTip [disabled]="!isInDraft" title="edit" [svgIcon]="pencilIcon" class="actionButton" fillMode="solid" themeColor="base"></button>
+
+            <button  kendoGridRemoveCommand kendoToolTip [disabled]="!isInDraft" title="delete" [svgIcon]="trashIcon" class="deleteButton" fillMode="solid" themeColor="base">
+            </button>
+        </ng-template>
+
+
+    </kendo-grid-command-column>
+</kendo-grid>
+
+
+
+@if(isOpen){
+    <kendo-dialog (close)="toggle(1)" [minWidth]="400" [width]="900" [height]="500">
+        <kendo-dialog-titlebar>{{dialogStatus?'Add Invoice Line Item':'Edit Invoice Line Item'}}</kendo-dialog-titlebar>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="d-flex ">
+            <div class="mb-3 col-md-5 ms-5">
+                <label class="form-label">People Name</label><br>
+                <input type="text" formControlName="people_name" class="form-control bg-light" readonly>
+            </div>
+            <div class="mb-3 col-md-5 ms-5  ">
+                <label class="form-label">Assignment ID</label><br>
+                <input type="number" formControlName="assignment_id" class="form-control bg-light" readonly>
+            </div>
+        </div>
+
+            <div class="d-flex justify-content-evenly">
+            <div class="mb-3 col-md-5">
+                <label >Customer Name</label><br>
+                <input type="text" formControlName="customer_name" class="form-control bg-light" readonly>
+            </div>
+            <div class="mb-3 col-md-5">
+                <label >Due date</label><br>
+                <input type="date" formControlName="due_date" class="form-control bg-light" readonly>
+            </div>
+            </div>
+
+            <div class="d-flex justify-content-evenly">
+            <div class="mb-3 col-md-5  mx-1" style="display: inline-block;">
+                <label class="form-label">Hourly Pay</label>
+                <input type="text" class="form-control"
+                formControlName="hourly_pay"
+                placeholder="enter hourly pay" >
+                <div class="text-danger" *ngIf="form.get('hourly_pay')?.invalid && form.get('hourly_pay')?.touched">
+                    Please enter some valid value
+                </div>
+            </div>
+            <div class="mb-3  col-md-5" style="display: inline-block;">
+                <label class="form-label">Hours Worked</label>
+                <input type="text" class="form-control"
+                formControlName="hours_worked"
+                placeholder="enter hours worked" >
+                <div class="text-danger" *ngIf="form.get('hours_worked')?.invalid && form.get('hours_worked')?.touched">
+                    Please enter some valid value
+                </div>
+
+            </div>
+            </div>
+            <div class="mb-3 ms-5" style="width:89%">
+                <label class="form-label">Description</label>
+                <input type="tex" class="form-control"
+                formControlName="description"
+                placeholder="enter ur description" style="width: 100%;">
+                <div class="text-danger" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">
+                    Please enter some description
+                </div>
+            </div>
+            </form>
+            <kendo-dialog-actions>
+            <button kendoButton (click)="toggle(1)"> Cancel
+            </button>
+
+            <button kendoButton class="actionButton"  (click)="onSubmit(dialogStatus)" [disabled]="form.invalid">Save
+            </button>
+</kendo-dialog-actions>
+
+
+</kendo-dialog>
+}

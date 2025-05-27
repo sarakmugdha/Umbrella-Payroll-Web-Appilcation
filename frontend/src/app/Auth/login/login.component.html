@@ -1,0 +1,53 @@
+<app-spinner [isLoading]="isLoading"></app-spinner>
+<div class="container flex">
+  <div class="facebook-page flex">
+    <div class="text" >
+      <h1>PayCaddy</h1>
+      <p>Your Payroll, Simplified.</p>
+    </div>
+    <form #loginForm="ngForm" (ngSubmit)="onLogin(loginForm)">
+      <h3>LOGIN</h3>
+      <div class="form-group">
+        <div class="field">
+          <input type="text" name="name" id="name" #name="ngModel" ngModel required>
+          <label for="name" fata-title="Username/Email" title="Username/Email"></label>
+        </div>
+        <div class="error-wrapper">
+          <ng-container *ngIf="name.invalid && name.touched;else noerror">
+            <small class="alert">*Enter your email/username</small>
+          </ng-container>
+
+          <ng-template #noerror><small class="error">&nbsp;</small>
+          </ng-template>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="field">
+          <input type="password" name="pwd" id="pwd" required ngModel #pwd="ngModel">
+          <label for="pwd" title="Password" data-title="Password"></label>
+        </div>
+        <div class="error-wrapper">
+          <ng-container *ngIf="pwd.invalid && pwd.touched;else noerror">
+            <small class="alert">*Password cant be empty</small>
+          </ng-container>
+          <ng-template #noerror><small class="error">&nbsp;</small>
+          </ng-template>
+        </div>
+      </div>
+
+
+
+      <div class="link">
+        <button type="submit" class="login" [disabled]="loginForm.invalid">Login</button>
+        <a routerLink="/forgot-password" class="forgot">Forgot password?</a>
+
+      </div>
+      <!-- <hr>
+      <div class="link">
+        <div class="link-dark"> <span>Doesn't have an account?  </span> <a routerLink="/sign-up" class="link-primary">SignUp</a> </div>
+      </div> -->
+
+    </form>
+
+  </div>
+</div>

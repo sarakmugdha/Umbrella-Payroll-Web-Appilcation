@@ -1,0 +1,135 @@
+<!-- spinner -->
+<app-spinner [isLoading]="isLoading"></app-spinner>
+
+<!-- breadcrumb -->
+    <nav>
+
+        <ol class="breadcrumb" >
+            <li class="breadcrumb-item">
+                <a routerLink="/afa/dashboard" class="text-decoration-none text-white" >
+                    Dashboard
+                </a>
+            </li>
+
+          <li class="breadcrumb-item" *ngIf="companyName">
+            <a routerLink="/afa/companies" class="text-decoration-none text-white" >
+                {{companyName}}
+            </a>
+        </li>
+          <li class="breadcrumb-item active" *ngIf="companyName">Timesheet</li>
+        </ol>
+      </nav>
+
+<!-- search toggle -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mt-0 mb-1">
+    <h3>Timesheet</h3>
+    <div class="d-flex justify-content-end gap-2">
+
+        <h5>Filter</h5>
+        <button kendoToolTip title="filter data" (click)="onFilterValue()"
+        kendoButton
+        [svgIcon]="searchIcon"
+        class="actionButton"
+        >
+    </button>
+    </div>
+    </div>
+
+
+<!-- search container -->
+<form
+class="filter-div p-2 mb-3"
+[formGroup]="filterForm"
+(ngSubmit)="onSubmit()"
+*ngIf="onFilter"
+>
+<div class="d-flex justify-content-between ">
+    <div class="d-flex">
+<div class="pe-4" *ngFor="let filter of filters">
+      <div class="form-group">
+      <label class="form-label fw-bold" > {{ filter.title }}</label>
+      <input *ngIf="filter.editor === 'number' || filter.editor === 'string'"
+  [type]="'text'"
+  formControlName="{{ filter.field }}"
+  class="form-control"
+  [placeholder]="filter.title"
+
+/>
+<div *ngIf = "filter.editor === 'date'" >
+    <kendo-datepicker
+        [formControlName]="filter.field"
+        [placeholder]="filter.title || ''"
+        [format]="'dd-MM-yyyy'"
+
+
+    >
+    </kendo-datepicker>
+</div>
+
+      </div>
+</div>
+</div>
+<div class="d-flex justify-content-end text-end align-items-end gap-2">
+    <button kendoButton type="button" class="gap-3 "  (click)="onClear()" fillMode="solid" themeColor="base" [svgIcon]="filterClearIcon">Clear</button>
+    <button kendoButton type="submit" class="gap-3 actionButton" [svgIcon]="filterIcon"  >Search</button>
+    </div>
+
+</div>
+</form>
+    <kendo-grid class="grid"
+    [data]="gridData"
+    [pageSize]="pageSize"
+    [loading]="isGridLoading"
+    [skip]="skip"
+     [pageable]="true"
+     [resizable]="true"
+     [scrollable]="'none'"
+
+
+     (pageChange)="pageChange($event)"
+    (add)="addHandler($event)"
+    (save)="saveHandler($event)"
+    (edit)="editHandler($event )"
+    (cancel)="cancelHandler($event)"
+    (remove)="removeHandler($event)"
+    >
+        <ng-template  kendoGridToolbarTemplate>
+            <div class="d-flex justify-content-end w-100">
+          <button kendoGridAddCommand kendoToolTip  title="add" class="actionButton" [svgIcon]="addIcon" [disabled]="isGridInEditMode" fillMode="solid" themeColor="base"> Add New Timesheet
+           </button></div>
+        </ng-template>
+        <kendo-grid-column  field="name" title="Name" >
+        </kendo-grid-column>
+        <kendo-grid-column field="timesheet_count" title="Timesheet Count"  >
+        </kendo-grid-column>
+        <kendo-grid-column field="period_end_date" title="Period End Date" editor="date">
+            <ng-template kendoGridCellTemplate let-dataItem>
+                <span>{{dataItem.period_end_date | date:'dd/MM/yyyy'}}</span>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column  title="Invoice Status"  >
+
+            <ng-template kendoGridCellTemplate let-dataItem >
+                <div class="d-flex justify-content-center">
+                <span [ngClass]=" {' bg-success ': dataItem.invoice_sent === 1,
+                                   ' bg-warning ': dataItem.invoice_sent === 0 || !dataItem.invoice_sent,
+                                   ' bg-danger ': dataItem.invoice_sent === 2 }"
+                                    class="badge badge-pill ">{{ dataItem.invoice_sent === 1 ? 'Sent' : dataItem.invoice_sent === 2 ? 'Empty' :  'Draft' }}
+                </span></div>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-command-column title="Action">
+            <ng-template kendoGridCellTemplate let-dataItem>
+                    <button kendoButton kendoToolTip title="view" [svgIcon]="eyeIcon"  class="actionButton"  *ngIf="!isGridInEditMode && !inEditMode" fillMode="solid" themeColor="base" (click)="timeSheetDetail(dataItem)"></button>
+                    <button kendoButton kendoToolTip title="view" [svgIcon]="pdfIcon"  class="actionButton"  *ngIf="!isGridInEditMode && !inEditMode" fillMode="solid" themeColor="base" (click)="downloadExcel(dataItem.timesheet_id,dataItem.name)"></button>
+             <button kendoGridEditCommand kendoToolTip *ngIf="!inEditMode  " [disabled]="dataItem.invoice_sent" title="edit" [svgIcon]="pencilIcon" class="actionButton" fillMode="solid" themeColor="base">
+             </button>
+             <button kendoGridCancelCommand kendoToolTip title="cancel" [svgIcon]="cancelIcon" class="deleteButton" fillMode="solid" themeColor="base">
+             </button>
+             <button kendoGridSaveCommand kendoToolTip title="save" [svgIcon]="checkIcon" fillMode="solid" class="actionButton" themeColor="base" [disabled]="formGroup?.invalid ?? false">
+             </button>
+             <button kendoGridRemoveCommand kendoToolTip *ngIf="!inEditMode" [disabled]="dataItem.invoice_sent" title="delete" [svgIcon]="trashIcon" class="deleteButton" fillMode="solid" themeColor="base">
+             </button>
+            </ng-template>
+         </kendo-grid-command-column>
+    </kendo-grid>

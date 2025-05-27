@@ -1,0 +1,229 @@
+<app-spinner [isLoading]="isLoading"></app-spinner>
+
+
+
+  <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a routerLink='/afa/dashboard'class="text-decoration-none text-white" >
+             Dashboard
+          </a>
+          </li>
+          <li class="breadcrumb-item"  *ngIf="companyName">
+          <a routerLink='/afa/companies' class="text-decoration-none text-white" >
+              {{companyName}}
+          </a>
+          </li>
+          <li class="breadcrumb-item active"  *ngIf="companyName" >
+          Invoice
+          </li>
+
+      </ol>
+  </nav>
+
+
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center mt-0 mb-1">
+<h3>Invoice</h3>
+<div class="d-flex justify-content-between gap-2">
+
+    <h5 >Filter</h5>
+    <button kendoToolTip title="filter data" (click)="onFilterValue()"
+            kendoButton
+            [svgIcon]="searchIcon"
+            class="actionButton"
+            >
+    </button>
+  </div></div>
+
+  <form
+class="filter-div p-2 mb-3"
+[formGroup]="filterForm"
+(ngSubmit)="onSubmit()"
+*ngIf="onFilter"
+>
+<div class="d-flex justify-content-between ">
+    <div class="d-flex">
+<div class="pe-4" *ngFor="let filter of filters">
+      <div class="form-group">
+      <label class="form-label fw-bold" > {{ filter.title }}</label>
+      <input *ngIf="filter.editor === 'number' || filter.editor === 'string'"
+  [type]="'text'"
+  formControlName="{{ filter.field }}"
+  class="form-control"
+  [placeholder]="filter.title"
+
+/>
+<div *ngIf = "filter.editor === 'date'" >
+    <kendo-datepicker
+        [formControlName]="filter.field"
+        [placeholder]="filter.title || ''"
+        [format]="'dd-MM-yyyy'"
+
+
+    >
+    </kendo-datepicker>
+</div>
+
+      </div>
+</div>
+</div>
+<div class="d-flex justify-content-end text-end align-items-end gap-2">
+    <button kendoButton type="button" class="gap-3 "  (click)="onClear()" fillMode="solid" themeColor="base" [svgIcon]="filterClearIcon">Clear</button>
+    <button kendoButton type="submit" class="gap-3 actionButton" [svgIcon]="filterIcon"  >Search</button>
+    </div>
+
+</div>
+</form>
+
+<kendo-grid
+class="compact-grid"
+[data]="invoiceData"
+[pageSize]="pageSize"
+[skip]="skip"
+[sortable]="true"
+[resizable]="true"
+[pageable]="true"
+[scrollable]="'none'"
+
+
+(pageChange)="pageChange($event)"
+(edit)="editInvoice($event)"
+(add)="addInvoiceRow($event)"
+(save)="saveInvoice($event)"
+(cancel)="cancelNewInvoice($event)"
+(remove)="deleteToggle($event)"
+>
+
+    <ng-template  kendoGridToolbarTemplate >
+        <div class="d-flex justify-content-end w-100">
+        <button kendoGridAddCommand [disabled]="inAddMode || inEditMode" kendoToolTip  title="add" class="actionButton"
+         [svgIcon]="addIcon"
+         fillMode="solid" themeColor="base">Add New Invoice
+        </button>
+
+   </div> </ng-template>
+
+    <kendo-grid-column field="invoice_number" title="Invoice No:"  [width]="100">
+
+    </kendo-grid-column>
+
+    <kendo-grid-column field="assignment_id" title="Assignment No:" [width]="130">
+        <ng-template *ngIf="inAddMode" kendoGridEditTemplate>
+            <select (change)="getAssignment($event)" class="form-select">
+                <option value="select" disabled selected>select </option>
+                <option *ngFor="let item of assignmentIdList" value="{{item}}" >{{item}}</option>
+            </select>
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+          <div class="truncate" [title]="dataItem.assignment_id">
+            {{dataItem.assignment_id}}
+          </div>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-column field="people_name" title="Contractor" >
+
+        <ng-template *ngIf="inAddMode" kendoGridEditTemplate>{{assignmentDetails.name}}</ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+          <div class="truncate" [title]="dataItem.people_name">
+            {{dataItem.people_name}}
+          </div>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-column  field="customer_name" title="Client">
+        <ng-template *ngIf="inAddMode" kendoGridEditTemplate>
+            {{assignmentDetails.customer_name}}
+        </ng-template>
+        <ng-template kendoGridCellTemplate let-dataItem>
+          <div class="truncate" [title]="dataItem.customer_name">
+            {{dataItem.customer_name}}
+          </div>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-column field="due_date" title="Due Date" editor="date" [width]="200">
+      <ng-template kendoGridCellTemplate let-dataItem>
+        <div class="truncate" [title]="dataItem.due_date">
+          {{dataItem.due_date | date:'dd/MM/yyyy'}}
+        </div>
+      </ng-template>
+      <ng-template kendoGridEditTemplate let-dataItem>
+        <kendo-datepicker placeholder="Due Date"
+                          [min]="restrictDate"></kendo-datepicker>
+      </ng-template>
+    </kendo-grid-column>
+    <kendo-grid-column field="total_pay" title="Total Pay" [editable]="false" [width]="100">
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <div class="truncate" [title]=" dataItem.total_pay|currency:'EUR'" class="d-flex justify-content-end">
+        {{dataItem.total_pay|currency:'EUR'}}
+      </div>
+    </ng-template>
+    </kendo-grid-column>
+
+
+    <kendo-grid-column field="status" title="Status" [editable]="false" [width]="95" >
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <span [ngClass]=" {'bg-warning': dataItem.status === 'Draft',
+                               'bg-primary': dataItem.status === 'Sent',
+                               'bg-success': dataItem.status === 'Paid',
+                               'bg-danger':dataItem.status==='Overdue'
+                              }" class="badge badge-pill">{{dataItem.status}}
+            </span>
+        </ng-template>
+    </kendo-grid-column>
+
+    <kendo-grid-command-column title="Actions" [width]="225">
+        <ng-template kendoGridCellTemplate let-dataItem>
+            <button *ngIf="!inAddMode && !inEditMode" kendoButton kendoToolTip title="View Invoice Details" [svgIcon]="eyeIcon"  class="actionButton"  fillMode="solid" themeColor="base" (click)="viewDetails(dataItem)"></button>
+            <button *ngIf="(!inAddMode && !inEditMode)" [disabled]="dataItem.total_pay==0" kendoButton kendoToolTip title="Send Invoice " [svgIcon]="exportIcon"  class="actionButton" (click)="mailInvoice(dataItem)">
+
+            </button>
+
+            <button *ngIf="!inAddMode && !inEditMode" [disabled]="dataItem.total_pay==0" kendoButton kendoToolTip title="Download PDF" [svgIcon]="fileIcon" fillMode="outline" class="actionButton" fillMode="solid" themeColor="base" (click)="downloadPDF(dataItem.invoice_number)">
+
+            </button>
+
+            <!-- <button *ngIf="!inAddMode && !inEditMode" kendoGridEditCommand kendoToolTip  title="edit due date" [svgIcon]="pencilIcon" class="actionButton" fillMode="solid" themeColor="base"></button> -->
+            <button kendoGridCancelCommand  kendoToolTip title="cancel" [svgIcon]="cancelIcon" class="deleteButton" fillMode="solid" themeColor="base">
+            </button>
+            <button kendoGridSaveCommand kendoToolTip title="save" [svgIcon]="checkIcon" fillMode="solid" class="actionButton" themeColor="base">
+            </button>
+            <button *ngIf="!inAddMode && !inEditMode" [disabled]="dataItem.status!='Draft'" kendoGridRemoveCommand kendoToolTip  title="delete" [svgIcon]="trashIcon" class="deleteButton" fillMode="solid" themeColor="base">
+            </button>
+        </ng-template>
+
+
+    </kendo-grid-command-column>
+
+</kendo-grid>
+
+<!-- Warning to create duplicate Invoice Entry -->
+<kendo-dialog *ngIf="dialogOpen" title="Please confirm"  (close)="dialogToggle(0)"
+[minWidth]="250" [width]="450">
+  <p style="margin: 30px; text-align: center;">
+    Invoice already exists with same due date<br>
+    Proceeding to the Invoice Page
+  </p>
+  <kendo-dialog-actions>
+    <button kendoButton (click)="dialogToggle(0)" class="actionButton">Back</button>
+    <button kendoButton (click)="dialogToggle(1)" themeColor="base" class="deleteButton">
+      Proceed Anyway
+    </button>
+  </kendo-dialog-actions>
+</kendo-dialog>
+
+<!-- Delete Invoice Dialog Box confirmation -->
+<kendo-dialog *ngIf="deleteIsOpen" title="Please confirm" (close)="deleteToggle()" [minWidth]="250" [width]="450">
+  <p style="margin: 30px; text-align: center;">
+    Deleting Invoice Column<br>
+    Proceeding further will cause losing Invoice
+  </p>
+  <kendo-dialog-actions>
+    <button kendoButton (click)="deleteToggle()" class="actionButton">Back</button>
+    <button kendoButton (click)="removeInvoiceRow()" themeColor="base" class="deleteButton">
+      Proceed Anyway
+    </button>
+  </kendo-dialog-actions>
+</kendo-dialog>

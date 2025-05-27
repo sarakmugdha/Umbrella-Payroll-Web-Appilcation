@@ -1,0 +1,175 @@
+<!-- spinner -->
+<app-spinner [isLoading]="isLoading"></app-spinner>
+
+<!-- breadcrumb -->
+<nav  >
+
+  <ol class="breadcrumb" >
+      <li class="breadcrumb-item">
+          <a routerLink="/afa/dashboard" class="text-decoration-none text-white" >
+              Dashboard
+          </a>
+      </li>
+
+    <li class="breadcrumb-item" *ngIf="companyName">
+      <a routerLink="/afa/companies" class="text-decoration-none text-white" >
+          {{companyName}}
+      </a>
+  </li>
+    <li class="breadcrumb-item" *ngIf="companyName">
+      <a routerLink="/afa/timesheet" class="text-decoration-none text-white" >
+        {{timesheetName}}
+    </a>
+
+    </li>
+    <li class="breadcrumb-item active" *ngIf="companyName">Timesheet Details</li>
+  </ol>
+</nav>
+
+<!-- search toggle -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+  <h3>Timesheet Details</h3>
+  <div class="d-flex justify-content-end gap-2">
+
+    <h5>Filter</h5>
+    <button kendoToolTip title="filter data" (click)="onFilterValue()"
+    kendoButton
+    [svgIcon]="searchIcon"
+    class="actionButton"
+    >
+</button>
+</div>
+  <!-- <div class="d-flex align-items-center search-bar-container">
+    <i class="bi bi-search"></i>
+    <input placeholder="Search"   class="search-bar" (input)="searchGrid($event)"/>
+</div> -->
+</div>
+
+<!-- search container -->
+<form
+class="filter-div p-2 mb-3"
+[formGroup]="filterForm"
+(ngSubmit)="onSubmit()"
+*ngIf="onFilter"
+>
+<div class="d-flex justify-content-between ">
+    <div class="d-flex">
+<div class="pe-4" *ngFor="let filter of filters">
+      <div class="form-group">
+      <label class="form-label fw-bold" > {{ filter.title }}</label>
+      <input
+  [type]="'text'"
+  formControlName="{{ filter.field }}"
+  class="form-control"
+  [placeholder]="filter.title"
+
+/>
+
+      </div>
+</div>
+</div>
+<div class="d-flex justify-content-end text-end align-items-end gap-2">
+    <button kendoButton type="button" class="gap-3 "  (click)="onClear()" fillMode="solid" themeColor="base" [svgIcon]="filterClearIcon">Clear</button>
+    <button kendoButton type="submit" class="gap-3 actionButton" [svgIcon]="filterIcon"  >Search</button>
+    </div>
+
+</div>
+</form>
+
+
+<!-- kendo-grid -->
+<kendo-grid class="grid" [data]="gridData" [pageSize]="pageSize" [pageable]="true" [resizable]="true" [loading]="isGridLoading"  [scrollable]="'none'"
+   (pageChange)="pageChange($event)" (edit)="editHandler($event)" (add)="addHandler($event)"
+  (cancel)="cancelHandler($event)" (save)="saveHandler($event)" (remove)="removeHandler($event)">
+  <ng-template kendoGridToolbarTemplate >
+    <div class="d-flex flex-wrap   justify-content-end w-100" >
+
+      <div *ngIf="!isGridInEditMode && !invoiceSent">
+        <span *ngIf="fileName" class="file-name me-2">{{ fileName }}</span>
+        <input hidden kendoButton type="file" #inputFile id="file" name="file" (change)="fileUpload($event,inputFile)"
+          enctype="multipart/form-data" accept=".csv">
+        <label kendoToolTip title="upload Timesheet" class="btn  btn-sm me-2  uploadButton" for="file" ><i
+            class="bi bi-upload me-2"></i>upload Timesheet</label>
+
+        <button kendoButton kendoToolTip title="proceed to invoice" class="actionButton me-2" [disabled]="isGridInEditMode || !gridData.total"
+          fillMode="solid" themeColor="base" (click)="proceedToInvoice($event)"> <i class="bi bi-receipt me-2 "></i>
+          Proceed to invoice</button>
+          <button kendoGridAddCommand kendoToolTip title="add" class="actionButton" [svgIcon]="addIcon"
+        *ngIf="!isGridInEditMode" fillMode="solid" themeColor="base">Add Entry </button>
+      </div>
+    </div>
+  </ng-template>
+  <kendo-grid-column field="assignment_id" title="Assignment Number" editor="text">
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <span *ngIf="!dataItem.assignment_id">Unmaped</span>
+      <span *ngIf="dataItem.assignment_id">{{dataItem.assignment_id}}</span>
+    </ng-template>
+    <ng-template kendoGridEditTemplate>
+      <div class="custom-select">
+      <select (change)="assignAssignment($event)" class="form-select" >
+        <option value="" disabled [selected]="inAddMode">select</option>
+        <option *ngFor="let item of assignmentIdList" value=" {{item}}" [selected]="item == assignmentId && !inAddMode">
+          {{ item }}</option>
+      </select></div>
+    </ng-template>
+  </kendo-grid-column>
+  <kendo-grid-column field='people_name' title="People Name" editor="text">
+    <span></span>
+    <ng-template kendoGridEditTemplate>
+      {{assignmentDetails[0].name}}
+    </ng-template>
+  </kendo-grid-column>
+  <kendo-grid-column field="customer_name" title="Customer Name" editor="text">
+    <ng-template kendoGridEditTemplate>
+      {{assignmentDetails[0].customer_name}}
+    </ng-template>
+  </kendo-grid-column>
+  <kendo-grid-column field="hours_worked" title="Hours Worked" editor="numeric">
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <div class="d-flex justify-content-end">
+        {{ dataItem.hours_worked }}
+      </div>
+    </ng-template>
+  </kendo-grid-column>
+  <kendo-grid-column field="hourly_pay" title="Hourly Pay" editor="numeric">
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <div class="d-flex justify-content-end">
+        {{ dataItem.hourly_pay }}
+      </div>
+    </ng-template>
+  </kendo-grid-column>
+  <kendo-grid-column field="total_pay" title="amount" >
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <div class="d-flex justify-content-end">
+      {{dataItem.hourly_pay * dataItem.hours_worked |currency:'EUR'}}
+    </div>
+    </ng-template>
+  </kendo-grid-column>
+
+
+  <kendo-grid-command-column title="Actions" *ngIf="!invoiceSent">
+    <ng-template kendoGridCellTemplate let-isNew="isNew">
+      <button kendoGridEditCommand kendoToolTip *ngIf="!inEditMode " title="edit" [svgIcon]="pencilIcon"
+        class="actionButton" fillMode="solid" themeColor="base"></button>
+      <button kendoGridCancelCommand kendoToolTip title="cancel" [svgIcon]="cancelIcon" class="deleteButton"
+        fillMode="solid" themeColor="base">
+      </button>
+      <button kendoGridSaveCommand kendoToolTip title="save" [svgIcon]="checkIcon" class="actionButton"
+        [disabled]="formGroup?.invalid ?? false"></button>
+      <button kendoGridRemoveCommand kendoToolTip *ngIf="!inEditMode" title="delete" [svgIcon]="trashIcon"
+        class="deleteButton" fillMode="solid" themeColor="base"></button>
+    </ng-template>
+  </kendo-grid-command-column>
+</kendo-grid>
+<kendo-dialog *ngIf="dialogOpen" title="Please confirm" (close)="close(false)" [minWidth]="250" [width]="450">
+  <p style="margin: 30px; text-align: center;">
+    Unmapped entries found<br>
+    Proceeding further will cause losing of unmaped entries
+  </p>
+  <kendo-dialog-actions>
+    <button kendoButton (click)="close(false)" class="actionButton">Back</button>
+    <button kendoButton (click)="close(true)" themeColor="base" class="deleteButton">
+      Proceed Anyway
+    </button>
+  </kendo-dialog-actions>
+</kendo-dialog>

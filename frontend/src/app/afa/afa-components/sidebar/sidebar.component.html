@@ -1,0 +1,98 @@
+<div  [ngClass]="{'sidebar-collapsed': isSidebarCollapsed}"
+  class="d-flex flex-column  p-3  text-white side"
+  style="width: 280px; height: 100vh;">
+
+  <div class=" sidebar-header" [ngClass]="{'sidebar-collapsed': isSidebarCollapsed}">
+
+  <a class="p-0"> <button (click)="toggleSidebar()"class="text-white toggle-btn ps-1 ">
+    ☰
+  </button>
+  </a>
+</div>
+
+ <a [routerLink]="home" class="sidebar-logo ps-2 text-white text-decoration-none">
+          <i class="bi bi-paypal  fs-2"></i>
+          <span class="fs-2 fw-semibold" *ngIf="!isSidebarCollapsed">ayCaddy</span>
+        </a>
+
+        <ul class="nav nav-pills flex-column mb-auto">
+        <hr>
+        <div *ngIf="currentRoute.includes('/super-admin')">
+          <li class="nav-item">
+            <a routerLink="dashboard"  routerLinkActive="active"
+             class="nav-link text-white" >
+             <i class="bi bi-buildings  "></i>
+             <span class="ps-2" *ngIf="!isSidebarCollapsed">Organizations</span>
+            </a>
+          </li>
+        </div>
+
+
+
+          <div *ngIf="currentRoute.includes('/afa')" >
+          <li class="nav-item">
+            <a routerLink="/afa/companies"  routerLinkActive="active"
+             class="nav-link text-white" >
+              <i class="bi bi-umbrella-fill "></i>
+              <span class="ps-2" *ngIf="!isSidebarCollapsed">Companies</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a routerLink="/afa/people"  routerLinkActive="active"
+            class="nav-link text-white">
+            <i class="bi bi-person"></i>
+              <span class="ps-2" *ngIf="!isSidebarCollapsed">Peoples</span>
+            </a>
+          </li>
+        </div>
+          <hr>
+          <div *ngIf="currentRoute.includes('/invoice/grid')||currentRoute.includes('/company') || currentRoute.includes('/assignment') ||currentRoute.includes('/timesheetDetails/') || currentRoute.includes('/timesheet') || currentRoute.includes('/invoice/')" >
+
+            <li class="nav-item">
+              <a routerLink="/afa/company" routerLinkActive="active" class="nav-link text-white">
+                <i class="bi bi-people "></i>
+                <span class="ps-2" *ngIf="!isSidebarCollapsed">Customers</span>
+              </a>
+            </li>
+          <li class="nav-item">
+            <a routerLink="/afa/assignment" routerLinkActive="active" class="nav-link text-white">
+              <i class="bi bi-link-45deg  "></i>
+              <span class="ps-2" *ngIf="!isSidebarCollapsed">Assignments</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/afa/timesheet" routerLinkActive="active" class="nav-link text-white " [ngClass]="{'activated': currentRoute.includes('/timesheetDetails')  }">
+              <i class="bi bi-table "></i>
+              <span class="ps-2" *ngIf="!isSidebarCollapsed">Timesheets</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/afa/invoice/grid" routerLinkActive="active" class="nav-link text-white button-24" [ngClass]="{'activated': currentRoute.includes('/invoice/details')  }">
+              <i class="bi bi-receipt  "></i>
+              <span class="ps-2" *ngIf="!isSidebarCollapsed">Invoices</span>
+            </a>
+          </li>
+          </div>
+        </ul>
+         <div *ngIf="currentRoute.includes('/afa')">
+        <hr>
+        <div class="dropdown  sidebar-logo">
+          <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+            <img [src]="sideBarLogo" alt="logo" width="32" height="32" class="sidebar-logo-img me-2">
+            <strong class="sidebar-logo-text">afa</strong>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark text-small shadow" style="z-index: 2000; min-width: 180px;" >
+
+
+
+            <li><a class="dropdown-item" (click)="logOut()">Sign out</a></li>
+
+          </ul>
+        </div>
+         </div>
+      </div>
+
+
+
+

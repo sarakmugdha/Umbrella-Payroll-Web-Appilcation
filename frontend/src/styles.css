@@ -1,0 +1,476 @@
+/* You can add global styles to this file, and also import other style files */
+/* theme Styles */
+:root {
+  --nav-active:#a8dadc;
+  --primary: #001F3F;
+  --secondary: #F0f4f8;
+  --h3:#001F3F;
+  --kendo-color-primary-on-surface:#001F3F !important;
+  --filter-shadow:1px 1px 4px 0px rgba(0, 0, 0, 0.3);
+  --grid-shadow:2px 2px 8px 0px rgba(0, 0, 0, 0.3);
+  --kendo-color-primary:#001F3F !important;
+  --kendo-color-primary-hover:#03509c!important;
+  --kendo-color-base-hover:#f0f4f873 !important;
+  --kendo-color-base:#F0f4f8!important;
+  --button-shadow:1.3px 1.3px 3px 0px rgba(0, 0, 0, 0.412);
+  --white-button-shadow:1.2px 1.2px 3px 0px rgba(0, 0, 0, 0.2);
+  --mat-sys-on-surface:var(--h3);
+  --mat-sys-surface-container:var( --kendo-color-surface-alt);
+
+
+}
+
+
+body.dark-mode{
+  --primary: black;
+  --nav-active:#001F3F;
+  --filter-shadow:2px 2px 8px 0px rgb(0, 0, 0);
+  --grid-shadow:2px 2px 8px 0px rgb(0, 0, 0);
+  --mat-sys-on-surface:var(--h3);
+  --mat-sys-surface-container:var( --kendo-color-surface-alt);
+  --h3:#F0f4f8;
+  --button-shadow:1.3px 1.3px 8px 0px rgba(0, 0, 0, 0.547);
+  --white-button-shadow:1.3px 1.3px 8px 0px rgba(0, 0, 0, 0.547);
+  --kendo-color-app-surface: #100f0f !important;
+  --kendo-color-on-app-surface: #F0f4f8 !important;
+  --kendo-color-subtle: #F0f4f8 !important;
+  --kendo-color-surface: #242424 !important;
+  --kendo-color-surface-alt: #333333 !important;
+  --kendo-color-primary-on-surface:#f0f4f8 !important;
+    transition: 0.3s ease;
+
+      background-color: #121212; /* Deep dark gray */
+      background-image:
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 4px),
+        repeating-linear-gradient(-45deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 4px);
+      color: #e0e0e0; /* Light text */
+
+}
+/* theme Styles ends */
+
+body{
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden  ;
+    background-color: var(--secondary);
+    transition:  0.3s ease;
+    background-image:
+        repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.05) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 4px),
+        repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.05) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 4px);
+
+
+}
+
+/* .bi{
+  font-size: 20px;
+} */
+
+
+.nav-link.activated{
+  background-color: var(--nav-active)!important;
+    color:  var(--h3) !important;
+    box-shadow: 6px 6px 8px 7px rgba(0, 0, 0, 0.2);
+
+}
+
+
+.nav-link.active {
+    background-color: var(--nav-active)!important;
+    color:  var(--h3) !important;
+    box-shadow: 6px 6px 8px 7px rgba(0, 0, 0, 0.2);
+
+  }
+
+
+
+.grid{
+
+    box-shadow:var(--grid-shadow)
+ }
+.actionButton{
+    background-color: #001F3F;
+    color: #F0f4f8;
+    box-shadow: var(--button-shadow)
+
+}
+.actionButton:hover{
+    color: #a8dadc;
+    background-color: #001F3F;
+}
+
+.k-grid-header .k-header {
+  font-weight: bold;
+}
+
+
+.deleteButton{
+    background-color: #F0f4f8;
+    color: red ;
+    box-shadow: var(--white-button-shadow);
+}
+.deleteButton:hover{
+    color: #F0f4f8;
+    background-color: red;
+
+}
+.uploadButton{
+    background-color: #001F3F !important;
+    color: #F0f4f8 !important;
+    box-shadow: var(--button-shadow);
+}
+.uploadButton:hover{
+    background-color: #001F3F !important;
+    color: #a8dadc !important;
+}
+
+button:active,.uploadButton{
+  translate: 0.5px 0.5px;
+}
+
+
+/* Status button */
+/* OFF state: white track */
+.k-switch:not(.k-switch-on) .k-switch-track {
+    background-color: #ffffff !important;
+    border-color: #001F3F !important;
+  }
+
+  /* ON state: dark blue track */
+  .k-switch.k-switch-on .k-switch-track {
+    background-color: #001F3F !important;
+    border-color: #001F3F !important;
+  }
+
+  /* Thumb styling for both states */
+  .k-switch .k-switch-thumb {
+    border-color: #001F3F !important;
+  }
+  .k-notification-container,.k-notification{
+    z-index: 25000 !important;
+  }
+
+
+  /* OFF state: dark thumb for visibility */
+  .k-switch:not(.k-switch-on) .k-switch-thumb {
+    background-color: #001F3F !important;
+  }
+
+  /* ON state: white thumb for contrast */
+  .k-switch.k-switch-on .k-switch-thumb {
+    background-color: #ffffff !important;
+  }
+
+h3{
+  color: var(--h3);
+  font-weight: 500 !important;
+  font-size: 2.2rem !important;
+}
+/* error placeholder */
+.error-placeholder {
+    height: 15px;
+    margin-top: 1px;
+    font-size: 12px;
+    line-height: 1;
+    overflow: auto;
+}
+/* dropdown */
+   .k-popup .k-list-item {
+    color: #010912cc !important;
+    background-color: #ffffff !important;
+  }
+
+  /* Override selected item styling */
+  .k-popup .k-list-item.k-selected,
+   .k-popup .k-list-item.k-state-selected {
+    background-color: #001F3F !important;
+    color: #ffffff !important;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .k-dialog-titlebar{
+    background-color: #001F3F;
+    color: aliceblue;
+  }
+  label{
+    font-weight: bold;
+  }
+
+  /* .card-header{
+    font-style: bold;
+    background-color: #a8dadcb5;
+    color: #001F3F;
+  }
+  .card-body{
+      background-color: #a8dadcb5 !important;
+      color: #001F3F;
+  } */
+
+
+
+
+
+
+/* Dialog box */
+
+.dialog-actions
+{
+  justify-content: flex-end;
+  gap: 10px;
+}
+kendo-dialog-actions
+{
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+
+
+.status-pill
+{
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  display: inline-block;
+  text-align: center;
+}
+
+.status-pill.Active
+{
+  background-color: #21ba45;
+}
+
+.status-pill.Inactive
+{
+  background-color: #db2828;
+}
+
+.dialog-form
+{
+  padding: 16px;
+}
+
+.form-grid
+{
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 10px 15px;
+  align-items: center;
+}
+
+
+
+
+/* breadcrumb */
+li.breadcrumb-item {
+
+  font-size: 13px !important;
+
+}
+li.breadcrumb-item a{
+  font-weight:400;
+  color: var(--h3)!important;
+}
+/* breadcrumb ends */
+
+/* Sidebar style */
+
+.side {
+  width: 280px;
+  transition: width 0.3s ease;
+  background-color: var(--primary);
+  overflow: visible;
+  height: 100vh;
+ }
+
+.sidebar-collapsed {
+  width: 80px !important;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  padding: 0rem ;
+
+}
+
+.toggle-btn {
+  font-size: 40px;
+  background: none;
+  border: none;
+  color: white;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.nav-link
+{
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-collapsed .nav-link
+{
+  justify-content:  center;
+}
+.sidebar-collapsed .nav-item
+{
+  width:48px;
+}
+.sidebar-collapsed .dropdown-toggle strong {
+  display: none !important;
+}
+.sidebar-logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+/* Sidebar style ends */
+
+
+.badge{
+  font-size: 14px !important;
+}
+
+h5{
+  color: var(--h3);
+  font-size: 20px;
+  font-weight:600;
+   margin: 0;
+   padding: 2px;
+}
+/* filter div */
+.filter-div{
+  border: 1px solid!important;
+  box-shadow:var(--filter-shadow)!important;
+  border-color: var(--kendo-color-surface-alt)!important;
+  background-color: var(--kendo-color-surface);
+  font-size: 14px;
+  color: var(--h3);
+}
+.filter-div input  {
+  background-color: var( --kendo-color-surface-alt)!important;
+  color: var(--h3)!important;
+  border: 1px solid var(--kendo-color-border-alt);
+  padding: 2px 6px!important;
+  width:170px;
+  height: 26px;
+}
+.filter-div input::placeholder{
+  color: var(--h3);
+  opacity: 60%;
+}
+.filter-div label{
+  margin-bottom:2px !important;
+}
+/* filter div ends */
+/* datepicker */
+.k-datepicker {
+
+  width:170px;
+  height: 26px;
+  font-size: 14px;
+  border: 1px solid var(--kendo-color-border-alt);
+}
+.k-datepicker:focus-within{
+
+  border-color: #86b7fe;
+  outline:0;
+  box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+}
+.custom-datepicker  {
+    height: 38px!important;
+    width: 100% !important;
+
+    background-color: var(--kendo-color-surface);
+
+}
+.custom-datepicker input{
+  padding-top: 0!important;
+  margin-top: 0!important;
+}
+/* datepicker style ends */
+/* button disabled */
+.k-button:disabled {
+  background-color: #5d696a9a;
+  color: #fff;
+  pointer-events: auto;
+}
+/* grid text truncate */
+.k-grid {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+}
+ .k-window-content label{
+  font-size: 15px;
+  margin-bottom: 4px;
+ }
+
+
+/* kendo dialog box styling */
+.k-window-content input ,.form-select{
+
+
+  background-color: var( --kendo-color-surface)!important;
+  color: var(--h3)!important;
+  border: 1px solid var(--kendo-color-border-alt);
+
+
+
+}
+.k-grid .form-select{
+  background-color: var( --kendo-color-surface-alt)!important;
+  color: var(--h3)!important;
+  height:28px;
+  padding:0px 0px 0px 5px;
+
+}
+.k-window{
+ border-radius: 0!important;
+
+}
+.k-
+
+.k-input-inner{
+  border: 0!important;
+
+}
+
+.k-window-content input:not([type='radio']) ,.form-select{
+  height: 40px;
+}
+
+
+
+
+
+
+

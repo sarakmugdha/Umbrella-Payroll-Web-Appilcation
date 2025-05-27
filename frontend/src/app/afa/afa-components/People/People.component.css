@@ -1,0 +1,11 @@
+::ng-deep .k-button:disabled {
+    background-color: #0930799a;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+::ng-deep .k-dialog {
+    border-radius: 10px;
+    animation: fadeInDialog 0.3s ease-in-out;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}

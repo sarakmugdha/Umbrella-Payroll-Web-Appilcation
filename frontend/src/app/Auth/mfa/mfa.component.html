@@ -1,0 +1,22 @@
+<div class="container flex">
+    <div class="facebook-page flex">
+        <div class="text">
+            <h1>PayCaddy</h1>
+            <p>Your Payroll, Simplified.</p>
+        </div>
+        <form class="qrContainer d-flex  justify-content-center align-items-center" #qrForm="ngForm" (ngSubmit)="otpHandler(qrForm)">
+
+            <div *ngIf="mfaStatus" class="d-flex flex-column  justify-content-center align-items-center">
+            <p class="fs-6" style="color:black;">Scan the below QR in your authenticator App</p>
+            <kendo-qrcode *ngIf="mfaStatus" [value]="qrUrl" errorCorrection="H">
+            </kendo-qrcode>
+            </div>
+
+
+            <p class="fs-6 mb-2" style = "color:#000 !important;">Enter the verification code below</p>
+            <kendo-otpinput type="number" placeholder="-" name="otp" ngModel fillMode="outline" [groupLength]='3' [length]="6" ></kendo-otpinput>
+            <button class="btn btn-primary mt-3 px-3 py-2" type="submit">Login</button>
+
+        </form>
+    </div>
+</div>

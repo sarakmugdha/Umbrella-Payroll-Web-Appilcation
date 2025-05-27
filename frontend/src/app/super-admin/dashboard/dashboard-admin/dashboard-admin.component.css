@@ -1,0 +1,30 @@
+.dashboardCard {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.dashboardCard:hover {
+transform: scale(1.01);
+}
+
+.card-icon {
+font-size: 24px;
+color: #001F3F;
+}
+
+.card-title {
+    font-size: 16px;
+    margin-right: 8px;
+    font-weight: 500;
+    color: #001F3F;
+}
+
+.card-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #001F3F;
+}
+  
+

@@ -1,0 +1,46 @@
+<h3>Assignment Gantt</h3>
+
+<!-- gantt chart -->
+<kendo-gantt
+  [ngStyle]="isSidebarToggled ? { width: '106%'} : { width: '91%'}"
+  [style.height.px]="530"
+  [kendoGanttHierarchyBinding]="data"
+  [dependencies]="dependencies"
+  [dependencyModelFields]="{
+    id: 'id',
+    fromId: 'fromId',
+    toId: 'toId',
+    type: 'type',
+  }"
+  >
+    <kendo-gantt-column
+        field="id"
+        title="Assignment ID"
+        [expandable]="true"
+        [width]="200">
+    </kendo-gantt-column>
+
+    <kendo-gantt-column
+        field="company_name"
+        title="Company"
+        [width]="200">
+    </kendo-gantt-column>
+
+    <kendo-gantt-column
+        field="customer_name"
+        title="Customer"
+        [width]="200">
+    </kendo-gantt-column>
+
+    <kendo-gantt-column
+        field="name"
+        title="People"
+        [expandable]="true"
+        [width]="200">
+    </kendo-gantt-column>
+    
+    <kendo-gantt-timeline-day-view></kendo-gantt-timeline-day-view>
+    <kendo-gantt-timeline-week-view></kendo-gantt-timeline-week-view>
+    <kendo-gantt-timeline-month-view></kendo-gantt-timeline-month-view>
+
+</kendo-gantt>

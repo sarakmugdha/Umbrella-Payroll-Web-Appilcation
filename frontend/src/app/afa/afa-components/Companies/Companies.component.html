@@ -1,0 +1,383 @@
+<app-spinner [isLoading]="loading"></app-spinner>
+
+<!-- breadcrumb -->
+<nav>
+  <ol class="breadcrumb" >
+      <li class="breadcrumb-item">
+          <a routerLink="/afa/dashboard" class="text-decoration-none text-white" >
+              Dashboard
+          </a>
+      </li>
+      <li class="breadcrumb-item active">Companies</li>
+    </ol>
+</nav>
+
+<!-- filteration -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mt-1 mb-0">
+  <h3>Company</h3>
+  <div class="d-flex justify-content-end gap-2">
+
+      <h5>Filter</h5>
+      <button kendoToolTip title="filter data" (click)="onFilterValue()"
+      kendoButton
+      [svgIcon]="searchIcon"
+      class="actionButton"
+      >
+  </button>
+  </div>
+</div>
+
+<!-- search container -->
+<form
+class="filter-div p-2 mb-3"
+[formGroup]="filterForm"
+(ngSubmit)="onSubmit()"
+*ngIf="onFilter"
+>
+<div class="d-flex justify-content-between ">
+  <div class="d-flex">
+<div class="pe-4" *ngFor="let filter of filters">
+    <div class="form-group">
+    <label class="form-label fw-bold" > {{ filter.title }}</label>
+    <input
+      [type]="filter.editor === 'number' ? 'number' : 'text'"
+      formControlName="{{ filter.field }}"
+      class="form-control"
+      [placeholder]="filter.title"/>
+    </div>
+</div>
+</div>
+<div class="d-flex justify-content-end text-end align-items-end gap-2">
+  <button kendoButton type="button" class="gap-3 "  (click)="onClear()" fillMode="solid" themeColor="base" [svgIcon]="filterClearIcon">Clear</button>
+  <button kendoButton type="submit" class="gap-3 actionButton" [svgIcon]="filterIcon"  >Search</button>
+  </div>
+</div>
+</form>
+
+<!-- grid -->
+<kendo-grid class="grid"
+            [data]="company"
+            [pageable]="true"
+            [pageSize]="pageSize"
+            [scrollable]="'none'"
+            [gridResizable] ="true"
+            [resizable]="true"
+            (pageChange)="pageChange($event)"
+            (remove)="onConfirmDelete($event)"
+            >
+
+  <ng-template kendoGridToolbarTemplate>
+    <div  class="d-flex justify-content-end align-items-center w-100">
+      <button kendoGridAddCommand kendoToolTip title="Add Company" class="actionButton" [svgIcon]="addIcon"
+        fillMode="solid" themeColor="base" (click)="open()"> Add Company </button>
+    </div>
+  </ng-template>
+
+  <kendo-grid-column [maxResizableWidth]="250" [minResizableWidth]="150">
+    <ng-template kendoGridHeaderTemplate>
+      <span kendoTooltip title="Company">Company</span>
+    </ng-template>
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <div kendoToolTip title="{{ dataItem.company_name }}">
+        {{ dataItem.company_name }}
+      </div>
+    </ng-template>
+  </kendo-grid-column>
+
+  <kendo-grid-column  [maxResizableWidth]="250" [minResizableWidth]="90">
+    <ng-template kendoGridHeaderTemplate>
+      <span kendoTooltip title="Company Email">Company Email</span>
+    </ng-template>
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <div kendoToolTip title="{{ dataItem.email }}">
+        {{ dataItem.email }}
+      </div>
+    </ng-template>
+  </kendo-grid-column>
+
+  <kendo-grid-column [minResizableWidth]="50" [maxResizableWidth]="130" [width]="120">
+    <ng-template kendoGridHeaderTemplate>
+      <span kendoTooltip title="VAT Percentage">VAT Percentage</span>
+    </ng-template>
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <div class="d-flex justify-content-end" kendoToolTip title="{{ dataItem.vat_percent }}">
+        {{ dataItem.vat_percent }}
+      </div>
+    </ng-template>
+  </kendo-grid-column>
+
+  <kendo-grid-column [minResizableWidth]="70" [maxResizableWidth]="200" [width]="80">
+    <ng-template kendoGridHeaderTemplate>
+      <span kendoTooltip title="Branch">Branch</span>
+    </ng-template>
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <div kendoToolTip title="{{ dataItem.city }}">
+        {{ dataItem.city }}
+      </div>
+    </ng-template>
+  </kendo-grid-column>
+
+  <kendo-grid-command-column [width]="130">
+    <ng-template kendoGridHeaderTemplate>
+      <span kendoTooltip title="Action">Action</span>
+    </ng-template>
+    <ng-template kendoGridCellTemplate let-dataItem>
+
+      <button (click)="viewHandler(dataItem)" kendoButton kendoTooltip title="View Company Details" [svgIcon]="eyeIcon"
+        class="actionButton" fillMode="solid" themeColor="base"></button>
+
+      <button kendoGridEditCommand kendoToolTip title="Edit Company" [svgIcon]="pencilIcon" class="actionButton"
+        fillMode="solid" themeColor="base" (click)="open(dataItem)"></button>
+
+      <button kendoGridRemoveCommand kendoGridRemoveCommand kendoToolTip title="Delete Company" [svgIcon]="trashIcon"
+        class="deleteButton" fillMode="solid" themeColor="base"></button>
+    </ng-template>
+  </kendo-grid-command-column>
+</kendo-grid>
+
+<!-- dialog box for add and edit -->
+<kendo-dialog *ngIf="opened" (close)="close()" [width]="600">
+  <kendo-dialog-titlebar>
+    {{ selectedCompany ? 'Edit Company' : 'Add Company'}}
+  </kendo-dialog-titlebar>
+
+  <form [formGroup]="companyForm" class="mx-auto justify-content-center align-items-center p-1 pb-0"
+    enctype="multipart/form-data">
+    <div class="row">
+      <div class="col">
+        <div class="form-group ">
+          <label for="company_name">Company Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="company_name" formControlName="company_name"
+            (input)="validationService.restrictSymbols($event)" pattern="^[a-zA-Z ]*$" required
+            [ngClass]="{ 'is-invalid': isInvalid('company_name') }">
+
+          <div class="error-placeholder">
+            <small *ngIf="companyForm.get('company_name')?.touched && companyForm.get('company_name')?.errors?.['required']" class="text-danger">
+              Company Name is required.
+            </small>
+            <small *ngIf="companyForm.get('company_name')?.dirty && companyForm.get('company_name')?.errors?.['pattern']" class="text-danger">
+              A valid company name is required.
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="form-group ">
+          <label for="email">Email ID <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" id="email" formControlName="email"
+            (input)="restrictEmailSymbols($event)" required [ngClass]="{ 'is-invalid': isInvalid('email') }">
+
+            <div class="error-placeholder">
+              <small *ngIf="companyForm.get('email')?.touched && companyForm.get('email')?.errors?.['required']" class="text-danger">
+                Company Email is required.
+              </small>
+              <small *ngIf="companyForm.get('email')?.dirty && companyForm.get('email')?.errors?.['email']" class="text-danger">
+                A valid email is required.
+              </small>
+            </div>
+
+        </div>
+
+        <div class="form-group ">
+          <label for="phone_number">Phone Number <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" id="phone_number" formControlName="phone_number"
+            (input)="validationService.restrictToNumbers($event)" length=10 required
+            [ngClass]="{ 'is-invalid': isInvalid('phone_number') }">
+
+            <div class="error-placeholder">
+              <small *ngIf="companyForm.get('phone_number')?.touched && companyForm.get('phone_number')?.errors?.['required']" class="text-danger">
+                Phone Number is required.
+              </small>
+              <small *ngIf="companyForm.get('phone_number')?.dirty && companyForm.get('phone_number')?.errors?.['pattern']" class="text-danger">
+                A valid phone number is required.
+              </small>
+            </div>
+
+        </div>
+
+        <div class="form-group ">
+          <label for="vat_percent">VAT Percentage <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" id="vat_percent" formControlName="vat_percent"
+            (input)="validationService.restrictVAT($event)" [ngClass]="{ 'is-invalid': isInvalid('vat_percent') }">
+
+            <div class="error-placeholder">
+              <small *ngIf="companyForm.get('vat_percent')?.touched && companyForm.get('vat_percent')?.errors?.['required']" class="text-danger">
+                VAT Percentage is required.
+              </small>
+              <small *ngIf="companyForm.get('vat_percent')?.dirty && companyForm.get('vat_percent')?.errors?.['pattern']" class="text-danger">
+                A valid VAT Percent is required.
+              </small>
+            </div>
+
+        </div>
+
+        <div class="form-group ">
+          <label for="domain">Domain <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="domain" formControlName="domain"
+            (input)="validationService.restrictSymbols($event)"
+            [ngClass]="{ 'is-invalid': isInvalid('domain') }">
+
+            <div class="error-placeholder">
+              <small *ngIf="companyForm.get('domain')?.touched && companyForm.get('domain')?.errors?.['required']" class="text-danger">
+                Domain is required.
+              </small>
+              <small *ngIf="companyForm.get('domain')?.dirty && companyForm.get('domain')?.errors?.['pattern']" class="text-danger">
+                A valid domain is required.
+              </small>
+            </div>
+
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-group ">
+          <label for="address">Address <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="address" formControlName="address"
+            [ngClass]="{ 'is-invalid': isInvalid('address') }"
+            (input)="validationService.restrictAddressInput($event)">
+
+            <div class="error-placeholder">
+              <small *ngIf="companyForm.get('address')?.touched && companyForm.get('address')?.errors?.['required']" class="text-danger">
+                Address is required.
+              </small>
+            </div>
+
+        </div>
+
+        <div class="form-group ">
+          <label for="city">City <span class="text-danger">*</span></label>
+          <input type="city" class="form-control" id="city" formControlName="city"
+            (input)="validationService.restrictSymbols($event)"
+            [ngClass]="{ 'is-invalid': isInvalid('city') }">
+
+            <div class="error-placeholder">
+              <small *ngIf="companyForm.get('city')?.touched && companyForm.get('city')?.errors?.['required']" class="text-danger">
+                City is required.
+              </small>
+              <small *ngIf="companyForm.get('city')?.dirty && companyForm.get('city')?.errors?.['pattern']"  class="text-danger">
+                A valid city is required.
+              </small>
+            </div>
+
+        </div>
+
+        <div class="form-group ">
+          <label for="state">State <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="state" formControlName="state"
+            (input)="validationService.restrictSymbols($event)"
+            [ngClass]="{ 'is-invalid': isInvalid('state') }">
+
+            <div class="error-placeholder">
+              <small *ngIf="companyForm.get('state')?.touched && companyForm.get('state')?.errors?.['required']" class="text-danger">
+                State is required.
+              </small>
+              <small *ngIf="companyForm.get('state')?.dirty && companyForm.get('state')?.errors?.['pattern']"  class="text-danger">
+                A valid state is required.
+              </small>
+            </div>
+
+        </div>
+
+        <div class="form-group ">
+          <label for="country">Country <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="country" formControlName="country"
+            (input)="validationService.restrictSymbols($event)"
+            [ngClass]="{ 'is-invalid': isInvalid('country') }">
+
+            <div class="error-placeholder">
+              <small *ngIf="companyForm.get('country')?.touched && companyForm.get('country')?.errors?.['required']" class="text-danger">
+                Country is required.
+              </small>
+              <small *ngIf="companyForm.get('country')?.dirty && companyForm.get('country')?.errors?.['pattern']"  class="text-danger">
+                A valid country is required.
+              </small>
+            </div>
+
+        </div>
+        <div class="form-group ">
+          <label for="pincode">Pincode <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" id="state" formControlName="pincode"
+            (input) = "validationService.restrictToNumbers($event)"
+            [ngClass]="{ 'is-invalid': isInvalid('pincode') }">
+
+            <div class="error-placeholder">
+              <small *ngIf="companyForm.get('pincode')?.touched && companyForm.get('pincode')?.errors?.['required']" class="text-danger">
+                Pincode is required.
+              </small>
+              <small *ngIf="companyForm.get('pincode')?.dirty && companyForm.get('pincode')?.errors?.['pattern']"  class="text-danger">
+                A valid pincode is required.
+              </small>
+            </div>
+
+        </div>
+      </div>
+
+
+    </div>
+
+    <div class="col">
+      <div class="form-group ">
+        <label class="form-control-label">Logo <span class="text-danger">*</span></label>
+        <div >
+          <input type="file" accept=".jpg, .jpeg" class="form-control" (change)="onFileChange($event)" />
+        </div>
+      </div>
+    </div>
+    <div class="d-flex align-items-start gap-3 flex-wrap">
+
+      <div>
+        <label class="form-control-label">Added Logo</label>
+        <div
+          *ngIf="companyForm.get('company_logo')?.value"
+          [ngStyle]="{
+            'background-image': 'url(' + companyForm.get('company_logo')?.value + ')'
+          }"
+          style="height: 100px; width: 100px; background-size: cover; background-position: center; background-repeat: no-repeat; border: 3px solid #001F3F; border-radius: 5px;">
+        </div>
+      </div>
+
+        <span *ngIf="emailExists"
+              class="alert alert-danger d-flex align-items-center mx-auto my-auto mt-4 p-3 shadow-sm rounded"
+              role="alert"
+              style="height: fit-content;">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>Email already exists!</strong>
+        </span>
+
+        <span *ngIf="imageType"
+              class="alert alert-danger d-flex align-items-center mx-auto my-auto mt-4 p-3 shadow-sm rounded"
+              role="alert"
+              style="height: fit-content;">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>Logo invalid format!</strong>
+        </span>
+      </div>
+
+  </form>
+  <kendo-dialog-actions>
+    <button kendoButton (click)="close()">
+      <kendo-icon name="cancel"></kendo-icon> Cancel
+    </button>
+    <button kendoButton class="actionButton" (click)="onSave()" [disabled]="companyForm.invalid">
+      <kendo-icon name="check"></kendo-icon>Save
+    </button>
+  </kendo-dialog-actions>
+</kendo-dialog>
+
+<!-- delete confirmation -->
+<kendo-dialog *ngIf="isDeleteDialogOpen" (close)="onCancelDelete()" [width]="450">
+  <kendo-dialog-titlebar>
+    Confirm Delete
+  </kendo-dialog-titlebar>
+
+  <p>Are you sure you want to delete <strong>{{ deleteDataItem?.dataItem.company_name }}</strong>?</p>
+
+  <kendo-dialog-actions>
+    <button kendoButton (click)="onCancelDelete()" themeColor="base" fillMode="solid" class="actionButton">
+      Cancel
+    </button>
+    <button kendoButton (click)="onConfirmDelete()" themeColor="base" class="deleteButton" fillMode="solid">
+      Delete
+    </button>
+  </kendo-dialog-actions>
+</kendo-dialog>

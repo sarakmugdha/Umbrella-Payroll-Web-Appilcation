@@ -1,0 +1,34 @@
+.customer-card{
+    
+    height: 200px;
+    margin-top: -30px;
+}
+
+.card-image{
+    height: 80px;
+    width: 100%;
+    background-image: url('../../../../public/istockphoto-1329715338-612x612.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative; 
+    background-color: #001F3F;
+}
+
+.company-logo{
+    height: 60px; 
+    width: 60px; 
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat; 
+    border: 3px solid #001F3F; 
+    border-radius: 50px;
+    position: relative;
+    padding-right: 5px;
+    border: 3px solid #001F3F;
+    border-radius: 50%;
+    margin-top: -50px;
+}
+
+.company-logo-container{
+    position: relative;
+}

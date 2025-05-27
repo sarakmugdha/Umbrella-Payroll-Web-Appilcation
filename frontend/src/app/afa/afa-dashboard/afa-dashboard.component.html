@@ -1,0 +1,20 @@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+<!-- spinner -->
+<app-spinner [isLoading]="loading"></app-spinner>
+
+<!-- card details -->
+<h3>Welcome, {{ company_name }}! </h3>
+<div class="gridTemplate">
+  <div class="dashboardCard d-flex flex-row align-items-center justify-content-around p-3 gap-4">
+    <div *ngFor="let stat of stats" class="d-flex flex-row align-items-center gap-2">
+      <i class="card-icon fa" [ngClass]="stat.icon" style="color: #001F3F;"></i> 
+      <div class="card-title mb-0">{{ stat.title }}</div>
+      <h3 class="card-text mb-0">{{ stat.value }}</h3>
+    </div>
+  </div>
+</div>
+
+<!-- gantt chart -->
+<div class="w-100 container" >
+    <app-gantt></app-gantt>
+</div>

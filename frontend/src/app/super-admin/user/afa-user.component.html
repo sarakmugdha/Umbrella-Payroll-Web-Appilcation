@@ -1,0 +1,205 @@
+<theme-changer></theme-changer>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+<!-- spinner -->
+<app-spinner [isLoading]="isLoading"></app-spinner>
+<!--breadcrumb -->
+<div class="d-flex justify-content-start breadcrumb-top-left">
+  <nav *ngIf="organization_name" class="mb-3 ">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/super-admin/dashboard']" class="text-decoration-none">
+          Dashboard
+        </a>
+      </li>
+
+      <li class="breadcrumb-item active">
+        <span class="breadcrumb-title">
+          {{ organization_name }}
+        </span>
+      </li>
+    </ol>
+  </nav>
+</div>
+<br>
+
+
+
+<!-- card-details -->
+<div class="card-body customer-card  filter-div">
+  <div class="card-image "> </div>
+  <div class="d-flex justify-content-start align-items-start">
+
+    <div *ngIf="orgForm?.get('organization_logo')?.value" class="company-logo-container p-2 z-2 position-absolute">
+      <div class="company-logo align-items-start flex-start justify-content-start "
+        [ngStyle]="{ 'background-image': 'url(' + orgForm.get('organization_logo')?.value + ')' }">
+
+      </div>
+    </div>
+  </div>
+  <br>
+
+  <div class="row g-2 align-items-start">
+    <div *ngIf="orgForm" class="col-md-6">
+      <p class="card-title fw-bold mb-1 h5"><i class="fa-solid fa-city"></i> {{orgForm.get('organization_name')?.value
+        }} | {{ orgForm.get('email')?.value }}</p>
+      <p class="text-muted mb-2"></p>
+      <p class="mb-0"><i class="fa-solid fa-location-dot"></i> {{ orgForm.get('address')?.value }}, {{
+        orgForm.get('state')?.value}}</p>
+    </div>
+  </div>
+
+</div>
+
+
+
+<!-- filteration -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mt-0 mb-1">
+  <h3>User</h3>
+  <div class="d-flex justify-content-end gap-2">
+    <h5>Filter</h5>
+
+    <button kendoToolTip title="filter data" (click)="onFilterValue()" kendoButton [svgIcon]="searchIcon"
+      class="actionButton">
+    </button>
+  </div>
+</div>
+
+<form class="filter-div p-2 mb-3" [formGroup]="filterForm" (ngSubmit)="onSubmit()" *ngIf="onFilter">
+  <div class="d-flex justify-content-between">
+    <div class="d-flex">
+      <div class="pe-4" *ngFor="let filter of filters">
+        <div class="form-group">
+          <label class="form-label fw-bold"> {{ filter.title }}</label>
+          <input [type]="filter.editor === 'number' ? 'number' : 'text'" formControlName="{{ filter.field }}"
+            class="form-control" [placeholder]="filter.title" />
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end text-end align-items-end gap-2 me-auto">
+      <button kendoButton type="button" class="gap-3" (click)="onClear()" fillMode="solid" themecolor="base"
+        [svgIcon]="filterClearIcon">Clear</button>
+      <button kendoButton type="submit" class="gap-3 actionButton" [svgIcon]="filterIcon">Search</button>
+    </div>
+  </div>
+</form>
+
+<kendo-grid [data]="gridData" [pageable]="true" [sortable]="true" [pageSize]="pageSize" [skip]="skip" [resizable]="true"
+  [scrollable]="'none'" (pageChange)="pageChange($event)">
+
+  <ng-template kendoGridToolbarTemplate>
+    <div class="d-flex justify-content-end align-items-center w-100">
+
+      <button kendoGridAddCommand kendoToolTip title="add" class="actionButton" [svgIcon]="addIcon" fillMode="solid"
+        themeColor="base" (click)="openDialog()">
+        Add New User
+      </button>
+    </div>
+  </ng-template>
+
+  <kendo-grid-column field="name" title="Name"></kendo-grid-column>
+  <kendo-grid-column field="email" title="Email"></kendo-grid-column>
+  <kendo-grid-column field="username" title="Username"></kendo-grid-column>
+  <kendo-grid-column title="Status">
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <kendo-switch [checked]="dataItem.status ===1" (valueChange)="toggleStatus(dataItem)" [onLabel]="''"
+        [offLabel]="''">
+      </kendo-switch>
+    </ng-template>
+  </kendo-grid-column>
+
+  <kendo-grid-command-column title="Actions">
+    <ng-template kendoGridCellTemplate let-dataItem>
+      <button kendoGridRemoveCommand kendoToolTip title="delete" [svgIcon]="trashIcon" class="deleteButton"
+        fillMode="solid" themeColor="base" (click)="removeHandler(dataItem)">
+      </button>
+    </ng-template>
+  </kendo-grid-command-column>
+</kendo-grid>
+
+
+
+<kendo-dialog *ngIf="isDialogOpen" (close)="closeDialog()" [width]="500">
+  <kendo-dialog-titlebar>
+    Add New User
+  </kendo-dialog-titlebar>
+
+  <form [formGroup]="userForm">
+    <div>
+      <label>Name<span class="text-danger">*</span></label>
+      <input class="form-control" formControlName="name" />
+      <div class="d-flex justify-content-center align-items-center error-placeholder">
+
+        <small *ngIf="userForm.get('name')?.touched && userForm.get('name')?.errors?.['required']"
+          class="text-danger text-center">
+          <strong> Name is required!</strong>
+        </small>
+
+      </div>
+
+
+      <label>Email<span class="text-danger">*</span></label>
+      <input class="form-control" formControlName="email" (change)="emailChange($event)" />
+      <div class="d-flex justify-content-center align-items-center error-placeholder">
+        <small *ngIf="emailExists" class="text-danger text-center">
+          <strong>Email already exists!</strong>
+        </small>
+
+        <small *ngIf="userForm.get('email')?.touched && userForm.get('email')?.errors?.['required']"
+          class="text-danger text-center">
+          <strong> Email is required!</strong>
+        </small>
+
+        <small *ngIf="userForm.get('email')?.dirty && userForm.get('email')?.errors?.['email']"
+          class="text-danger text-center">
+          <strong>A valid email is required!</strong>
+        </small>
+
+      </div>
+
+      <label>Username<span class="text-danger">*</span></label>
+      <input class="form-control" formControlName="username" />
+      <div class="d-flex justify-content-center align-items-center error-placeholder">
+
+        <small *ngIf="userForm.get('username')?.touched && userForm.get('username')?.errors?.['required']"
+          class="text-danger text-center">
+          <strong> Username is required!</strong>
+        </small>
+
+      </div>
+
+    </div>
+
+
+
+  </form>
+
+  <kendo-dialog-actions>
+
+    <button kendoButton themeColor="base" (click)="closeDialog()">
+      <kendo-icon name="cancel"></kendo-icon>Cancel
+    </button>
+
+    <button kendoButton themeColor="base" class="actionButton" (click)="saveUser()" [disabled]="userForm.invalid">
+      <kendo-icon name="check"></kendo-icon>Save
+    </button>
+
+
+  </kendo-dialog-actions>
+</kendo-dialog>
+<kendo-dialog *ngIf="isDeleteDialogOpen" (close)="onCancelDelete()" [width]="450">
+  <kendo-dialog-titlebar>
+    Confirm Delete
+  </kendo-dialog-titlebar>
+
+  <p>Are you sure you want to delete?</p>
+
+  <kendo-dialog-actions>
+    <button kendoButton (click)="onCancelDelete()" themeColor="base" fillMode="solid" class="actionButton">
+      Cancel
+    </button>
+    <button kendoButton (click)="onConfirmDelete()" themeColor="base" class="deleteButton" fillMode="solid">
+      Delete
+    </button>
+  </kendo-dialog-actions>
+</kendo-dialog>
